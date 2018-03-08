@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="/main.css" />
+
+</head>
+<body>
+
+  <ul id="messages"></ul>
+
+  <form action="">
+    <input type="text" autocomplete="off" placeholder="message" id="m">
+    <button type="submit">send message</button>
+  </form>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/main.js"></script>
+  <script>
+    let room = 'litroom';
+    let socket = io('/ns');
+
+    $('form').submit(() => {
+      let msg = $('#m').val();
+      socket.emit('message', {msg, room});
+      $('#m').val('');
+      return false;
+    });
+
+    socket.on('connect', () => {
+      socket.emit('join', { room: room })
+    })
+
+    socket.on('disconnect', () => {
+      socket.emit('message', 'user disconnected')
+    })
+
+    socket.on('message', (msg) => {
+      $('#messages').append($('<li>').text(msg))
+    })
+</script>
+</body>
+</html>
